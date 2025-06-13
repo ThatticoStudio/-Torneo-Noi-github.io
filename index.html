@@ -401,7 +401,7 @@ squadre.push({ nome, sport, girone });
     const s2 = squadre.find(s => s.nome === s2Nome);
 
     if (!s1 || !s2) return alert("Seleziona due squadre valide.");
-    if s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
+    if (s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
     if (s1.sport !== s2.sport) return alert("Le squadre devono appartenere allo stesso sport.");
 
     partite.push({ id: Date.now(), squadra1: s1.nome, squadra2: s2.nome, sport: s1.sport, risultato: null });
