@@ -96,14 +96,9 @@
 <section id="barman">
   <h2>Benvenuto Barman</h2>
   <p>Qui puoi vedere e gestire la coppa chiosco.</p>
-  <div class="dashboard">
-    <h3>Partite da Giocare</h3>
-    <table>
-      <thead><tr><th>Squadra 1</th><th>Squadra 2</th><th>Sport</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <div id="panel" class="dashboard"></div> <!-- AGGIUNTO -->
 </section>
+
 
   <section id="dashboard">
     <h2>Pannello di Controllo - Gestione Torneo</h2>
@@ -322,40 +317,47 @@ squadre.push({ nome, sport, girone });
   }
 
   function aggiornaClassifica(sport) {
-  const thead = document.getElementById("theadScoreboard");
   const tbody = document.getElementById("tbodyScoreboard");
+  const thead = document.getElementById("theadScoreboard");
+  thead.innerHTML = "";
   tbody.innerHTML = "";
 
-  thead.innerHTML = sport === "calcio"
-    ? "<tr><th>Girone</th><th>Squadra</th><th>Punti</th><th>GF</th><th>GS</th></tr>"
-    : "<tr><th>Girone</th><th>Squadra</th><th>Punti</th><th>Set Vinti</th><th>Set Persi</th></tr>";
+  const colonne = sport === "calcio"
+    ? "<tr><th>Squadra</th><th>Punti</th><th>GF</th><th>GS</th><th>DR</th></tr>"
+    : "<tr><th>Squadra</th><th>Punti</th><th>Set Vinti</th><th>Set Persi</th></tr>";
 
-  const squadreFiltrate = squadre.filter(s => s.sport === sport);
+  thead.innerHTML = ""; // svuotato per evitare duplicazioni
 
-  // Dividi per girone
-  const gironi = { A: [], B: [] };
-  for (const s of squadreFiltrate) {
-    gironi[s.girone].push(s.nome);
-  }
+  ["A", "B"].forEach(girone => {
+    const squadreGirone = squadre.filter(s => s.sport === sport && s.girone === girone);
 
-  for (const girone in gironi) {
-    const nomiSquadre = gironi[girone];
+    // Crea riga intestazione
+    const caption = document.createElement("tr");
+    caption.innerHTML = `<td colspan="5"><strong>Girone ${girone}</strong></td>`;
+    tbody.appendChild(caption);
 
-    nomiSquadre.forEach(nome => {
-      const dati = punteggi[nome];
-      if (!dati) return;
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = colonne;
+    tbody.appendChild(headerRow);
 
-      const tr = document.createElement("tr");
-      if (sport === "calcio") {
-        tr.innerHTML = `<td>${girone}</td><td>${nome}</td><td>${dati.punti}</td><td>${dati.gf}</td><td>${dati.gs}</td>`;
-      } else {
-        tr.innerHTML = `<td>${girone}</td><td>${nome}</td><td>${dati.punti}</td><td>${dati.sv}</td><td>${dati.sp}</td>`;
-      }
-      tbody.appendChild(tr);
+    const classifica = squadreGirone.map(s => {
+      const dati = punteggi[s.nome] || {};
+      return sport === "calcio"
+        ? { nome: s.nome, punti: dati.punti || 0, gf: dati.gf || 0, gs: dati.gs || 0, dr: (dati.gf || 0) - (dati.gs || 0) }
+        : { nome: s.nome, punti: dati.punti || 0, sv: dati.sv || 0, sp: dati.sp || 0 };
     });
-  }
-}
 
+    classifica.sort((a, b) => b.punti - a.punti || ((b.dr || (b.sv - b.sp)) - (a.dr || (a.sv - a.sp))));
+
+    classifica.forEach(s => {
+      const row = document.createElement("tr");
+      row.innerHTML = sport === "calcio"
+        ? `<td>${s.nome}</td><td>${s.punti}</td><td>${s.gf}</td><td>${s.gs}</td><td>${s.dr}</td>`
+        : `<td>${s.nome}</td><td>${s.punti}</td><td>${s.sv}</td><td>${s.sp}</td>`;
+      tbody.appendChild(row);
+    });
+  });
+}
 
   function aggiornaClassificaChiosco() {
       const tbody = document.getElementById("tbodyChiosco");
@@ -417,6 +419,21 @@ function aggiornaSelectGestione() {
     const risultato = p.risultato ? `${p.risultato.gol1}-${p.risultato.gol2}` : "da giocare";
     opt.textContent = `${p.squadra1} vs ${p.squadra2} (${p.sport}) - ${risultato}`;
     partiteElimina.appendChild(opt);
+  });
+}
+
+function aggiornaSelectSquadre() {
+  const s1 = document.getElementById("squadra1");
+  const s2 = document.getElementById("squadra2");
+  s1.innerHTML = "";
+  s2.innerHTML = "";
+  squadre.forEach(s => {
+    const opt1 = document.createElement("option");
+    opt1.value = s.nome;
+    opt1.textContent = s.nome;
+    const opt2 = opt1.cloneNode(true);
+    s1.appendChild(opt1);
+    s2.appendChild(opt2);
   });
 }
 
