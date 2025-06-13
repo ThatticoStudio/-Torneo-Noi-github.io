@@ -427,11 +427,16 @@ function aggiornaSelectSquadre() {
   const s2 = document.getElementById("squadra2");
   s1.innerHTML = "";
   s2.innerHTML = "";
+
+  if (squadre.length === 0) return;
+
   squadre.forEach(s => {
     const opt1 = document.createElement("option");
     opt1.value = s.nome;
     opt1.textContent = s.nome;
+
     const opt2 = opt1.cloneNode(true);
+
     s1.appendChild(opt1);
     s2.appendChild(opt2);
   });
