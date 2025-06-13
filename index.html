@@ -221,7 +221,10 @@
 }
 
 function showBarPanel() {
-  const panel = document.getElementById("chiosco");
+  nascondiTutte();
+  document.getElementById("barman").style.display = "block"; // Mostra la sezione giusta
+
+  const panel = document.getElementById("panel"); // Usa il pannello giusto
   panel.innerHTML = "<h2>Coppa Chiosco</h2>";
 
   // Ordina le squadre in base ai puntiBar (decrescente)
@@ -230,8 +233,6 @@ function showBarPanel() {
   // Mostra tutte le squadre ordinate
   squadreOrdinate.forEach((squadra, index) => {
     const punti = squadra.puntiBar || 0;
-
-    // Crea l'elemento HTML con nome, punti e input per inserire spesa
     const div = document.createElement("div");
     div.innerHTML = `
       <span><strong>${squadra.nome}</strong>: ${punti} punti</span>
