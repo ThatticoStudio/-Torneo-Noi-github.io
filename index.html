@@ -221,7 +221,7 @@
 }
 
 function showBarPanel() {
-  const panel = document.getElementById("panel");
+  const panel = document.getElementById("chiosco");
   panel.innerHTML = "<h2>Coppa Chiosco</h2>";
 
   // Ordina le squadre in base ai puntiBar (decrescente)
@@ -287,7 +287,7 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
       showDashboard();
     } else if (found.ruolo === "arbitro") {
       showRefereePanel();
-    } else if (found.ruolo === "barman") {
+    } else if (found.ruolo === "chiosco") {
       showBarPanel();
     }
   } else {
