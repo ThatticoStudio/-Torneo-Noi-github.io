@@ -81,24 +81,7 @@
     </div>
   </section>
 
-  <section id="dashboard">
-    <h2>Pannello di Controllo - Gestione Torneo</h2>
-    <div class="dashboard">
-      <h3>Aggiungi Squadra</h3>
-      <input type="text" id="nuovaSquadra" placeholder="Nome squadra" />
-      <select id="sportSquadra">
-        <option value="calcio">Calcio</option>
-        <option value="pallavolo">Pallavolo</option>
-      </select>
-      <button onclick="aggiungiSquadra()">Aggiungi</button>
-      <h3>Modifica o Elimina Squadre</h3>
-
-<select id="selectSquadraGestione"></select>
-<input type="text" id="nuovoNomeSquadra" placeholder="Nuovo nome squadra" />
-<button onclick="modificaSquadra()">Modifica Nome</button>
-<button onclick="eliminaSquadra()">Elimina Squadra</button>
-
-<section id="arbitro">
+  <section id="arbitro">
   <h2>Benvenuto Arbitro</h2>
   <p>Qui puoi vedere e gestire solo le partite senza modificare squadre.</p>
   <div class="dashboard">
@@ -122,6 +105,26 @@
   </div>
 </section>
 
+  <section id="dashboard">
+    <h2>Pannello di Controllo - Gestione Torneo</h2>
+    <div class="dashboard">
+      <h3>Aggiungi Squadra</h3>
+      <input type="text" id="nuovaSquadra" placeholder="Nome squadra" />
+      <select id="sportSquadra">
+        <option value="calcio">Calcio</option>
+        <option value="pallavolo">Pallavolo</option>
+      </select>
+      <select id="gironeSquadra">
+  <option value="A">Girone A</option>
+  <option value="B">Girone B</option>
+</select>
+      <button onclick="aggiungiSquadra()">Aggiungi</button>
+      <h3>Modifica o Elimina Squadre</h3>
+
+<select id="selectSquadraGestione"></select>
+<input type="text" id="nuovoNomeSquadra" placeholder="Nuovo nome squadra" />
+<button onclick="modificaSquadra()">Modifica Nome</button>
+<button onclick="eliminaSquadra()">Elimina Squadra</button>
 
 <h3>Elimina Partita</h3>
 <select id="selectPartitaElimina"></select>
@@ -300,12 +303,13 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
 
   function aggiungiSquadra() {
     const nome = document.getElementById("nuovaSquadra").value.trim();
-    const sport = document.getElementById("sportSquadra").value;
+const sport = document.getElementById("sportSquadra").value;
+const girone = document.getElementById("gironeSquadra").value;
     if (!nome) return alert("Inserisci il nome della squadra.");
     if (squadre.find(s => s.nome.toLowerCase() === nome.toLowerCase())) {
       return alert("Squadra già esistente.");
     }
-    squadre.push({ nome, sport });
+squadre.push({ nome, sport, girone });
     // Inizializza punteggi
     if (sport === "calcio") {
       punteggi[nome] = { punti: 0, gf: 0, gs: 0 };
@@ -317,20 +321,41 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
     aggiornaSelectSquadre();
   }
 
-  function aggiornaSelectSquadre() {
-    const s1 = document.getElementById("squadra1");
-    const s2 = document.getElementById("squadra2");
-    s1.innerHTML = "";
-    s2.innerHTML = "";
-    squadre.forEach(s => {
-      const o1 = document.createElement("option");
-      const o2 = document.createElement("option");
-      o1.value = o2.value = s.nome;
-      o1.text = o2.text = s.nome + " (" + s.sport + ")";
-      s1.appendChild(o1);
-      s2.appendChild(o2);
+  function aggiornaClassifica(sport) {
+  const thead = document.getElementById("theadScoreboard");
+  const tbody = document.getElementById("tbodyScoreboard");
+  tbody.innerHTML = "";
+
+  thead.innerHTML = sport === "calcio"
+    ? "<tr><th>Girone</th><th>Squadra</th><th>Punti</th><th>GF</th><th>GS</th></tr>"
+    : "<tr><th>Girone</th><th>Squadra</th><th>Punti</th><th>Set Vinti</th><th>Set Persi</th></tr>";
+
+  const squadreFiltrate = squadre.filter(s => s.sport === sport);
+
+  // Dividi per girone
+  const gironi = { A: [], B: [] };
+  for (const s of squadreFiltrate) {
+    gironi[s.girone].push(s.nome);
+  }
+
+  for (const girone in gironi) {
+    const nomiSquadre = gironi[girone];
+
+    nomiSquadre.forEach(nome => {
+      const dati = punteggi[nome];
+      if (!dati) return;
+
+      const tr = document.createElement("tr");
+      if (sport === "calcio") {
+        tr.innerHTML = `<td>${girone}</td><td>${nome}</td><td>${dati.punti}</td><td>${dati.gf}</td><td>${dati.gs}</td>`;
+      } else {
+        tr.innerHTML = `<td>${girone}</td><td>${nome}</td><td>${dati.punti}</td><td>${dati.sv}</td><td>${dati.sp}</td>`;
+      }
+      tbody.appendChild(tr);
     });
   }
+}
+
 
   function aggiornaClassificaChiosco() {
       const tbody = document.getElementById("tbodyChiosco");
