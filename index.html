@@ -222,20 +222,41 @@
 
 function showBarPanel() {
   nascondiTutte();
-  document.getElementById("barman").style.display = "block"; // Mostra la sezione giusta
+  document.getElementById("barman").style.display = "block";
 
-  const panel = document.getElementById("panel"); // Usa il pannello giusto
+  const panel = document.getElementById("panel");
   panel.innerHTML = "<h2>Coppa Chiosco</h2>";
 
-  // Ordina le squadre in base ai puntiBar (decrescente)
+  // Classifica Coppa Chiosco
   const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
+  let classificaHtml = `
+    <table style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>Squadra</th>
+          <th>Sport</th>
+          <th>Punti Bar</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${squadreOrdinate.map(s => `
+          <tr>
+            <td>${s.nome}</td>
+            <td>${s.sport}</td>
+            <td>${s.puntiBar || 0}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  panel.innerHTML += classificaHtml;
 
-  // Mostra tutte le squadre ordinate
+  // Pannello inserimento punti
   squadreOrdinate.forEach((squadra, index) => {
     const punti = squadra.puntiBar || 0;
     const div = document.createElement("div");
     div.innerHTML = `
-      <span><strong>${squadra.nome}</strong>: ${punti} punti</span>
+      <span><strong>${squadra.nome}</strong> (${squadra.sport}): ${punti} punti</span>
       <input type="number" id="spesa-${index}" placeholder="€ spesi" min="0" step="0.01" style="width: 80px; margin-left: 10px;" />
       <button onclick="aggiungiPuntiBarOrdinate(${index})">Aggiungi</button>
     `;
@@ -362,14 +383,15 @@ squadre.push({ nome, sport, girone });
   function aggiornaClassificaChiosco() {
       const tbody = document.getElementById("tbodyChiosco");
       tbody.innerHTML = "";
-      const entries = Object.entries(chiosco);
-      entries.sort((a, b) => b[1] - a[1]);
 
-      for (const [squadra, punti] of entries) {
+      // Ordina tutte le squadre per puntiBar decrescente
+      const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
+
+      squadreOrdinate.forEach(s => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${squadra}</td><td>${punti}</td>`;
+        tr.innerHTML = `<td>${s.nome}</td><td>${s.puntiBar || 0}</td>`;
         tbody.appendChild(tr);
-      }
+      });
     }
 
   function creaPartita() {
@@ -379,7 +401,7 @@ squadre.push({ nome, sport, girone });
     const s2 = squadre.find(s => s.nome === s2Nome);
 
     if (!s1 || !s2) return alert("Seleziona due squadre valide.");
-    if (s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
+    if s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
     if (s1.sport !== s2.sport) return alert("Le squadre devono appartenere allo stesso sport.");
 
     partite.push({ id: Date.now(), squadra1: s1.nome, squadra2: s2.nome, sport: s1.sport, risultato: null });
