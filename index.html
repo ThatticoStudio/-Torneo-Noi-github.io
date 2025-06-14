@@ -207,6 +207,26 @@ function salvaDati() {
 function nascondiTutte() {
   document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
 }
+function aggiungiSquadra() {
+  const nome = document.getElementById("nuovaSquadra").value.trim();
+  const sport = document.getElementById("sportSquadra").value;
+  const girone = document.getElementById("gironeSquadra").value;
+
+  if (!nome) return alert("Inserisci il nome della squadra!");
+
+  // Controlla che non esista già una squadra con lo stesso nome
+  if (squadre.some(s => s.nome === nome)) {
+    return alert("Esiste già una squadra con questo nome!");
+  }
+
+  squadre.push({ nome, sport, girone });
+  salvaDati();
+  aggiornaSelectSquadre();
+  aggiornaSelectGestione();
+  document.getElementById("nuovaSquadra").value = "";
+  alert("Squadra aggiunta!");
+}
+window.aggiungiSquadra = aggiungiSquadra;
 
 function showHome() {
   nascondiTutte();
@@ -513,6 +533,14 @@ window.showBarPanel = showBarPanel;
 window.login = login;
 window.creaPartita = creaPartita;
 window.aggiungiPuntiBarOrdinate = aggiungiPuntiBarOrdinate;
+window.aggiungiSquadra = aggiungiSquadra;
 </script>
 </body>
 </html>
+
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
