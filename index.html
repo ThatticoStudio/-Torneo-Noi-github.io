@@ -371,10 +371,19 @@ function creaPartita() {
   if (s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
   if (s1.sport !== s2.sport) return alert("Le squadre devono appartenere allo stesso sport.");
 
+  // Controlla che la partita non esista già
+  if (partite.some(p =>
+    (p.squadra1 === s1.nome && p.squadra2 === s2.nome && p.sport === s1.sport) ||
+    (p.squadra1 === s2.nome && p.squadra2 === s1.nome && p.sport === s1.sport)
+  )) {
+    return alert("Questa partita esiste già!");
+  }
+
   partite.push({ id: Date.now(), squadra1: s1.nome, squadra2: s2.nome, sport: s1.sport, risultato: null });
   salvaDati();
-  popolaPartite();
   aggiornaMatchList();
+  popolaPartite();
+  alert("Partita creata!");
 }
 function aggiornaClassifica(sport) {
   const tbody = document.getElementById("tbodyScoreboard");
