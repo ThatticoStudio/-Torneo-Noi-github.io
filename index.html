@@ -189,14 +189,13 @@ function caricaDatiDaFirebase() {
     chiosco = data.chiosco || {};
     aggiornaMatchList();
     aggiornaClassificaChiosco();
-    // ...altre funzioni di refresh...
+    aggiornaSelectGestione();
+    popolaPartite();
   });
 }
-
-// Chiama questa funzione all’avvio
 caricaDatiDaFirebase();
 
-  function salvaDati() {
+function salvaDati() {
   db.ref().set({
     squadre: squadre,
     partite: partite,
@@ -205,49 +204,48 @@ caricaDatiDaFirebase();
   });
 }
 
-  function nascondiTutte() {
-    document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+function nascondiTutte() {
+  document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
+}
+
+function showHome() {
+  nascondiTutte();
+  document.getElementById("home").style.display = "block";
+  aggiornaMatchList();
+}
+
+function showClassifica(sport) {
+  nascondiTutte();
+  document.getElementById("classifica").style.display = "block";
+  if (sport === "chiosco") {
+    document.getElementById("classificaChiosco").style.display = "block";
+    aggiornaClassificaChiosco();
+    document.getElementById("titoloClassifica").textContent = "Classifica Chiosco";
+    document.getElementById("scoreboard").style.display = "none";
+  } else {
+    document.getElementById("classificaChiosco").style.display = "none";
+    document.getElementById("scoreboard").style.display = "table";
+    document.getElementById("titoloClassifica").textContent = "Classifica " + sport.charAt(0).toUpperCase() + sport.slice(1);
+    aggiornaClassifica(sport);
   }
+}
 
-  function showHome() {
-    nascondiTutte();
-    document.getElementById("home").style.display = "block";
-    aggiornaMatchList();
-  }
+function showLogin() {
+  nascondiTutte();
+  document.getElementById("login").style.display = "block";
+}
 
-   function showClassifica(sport) {
-      nascondiTutte();
-      document.getElementById("classifica").style.display = "block";
-      if (sport === "chiosco") {
-        document.getElementById("classificaChiosco").style.display = "block";
-        aggiornaClassificaChiosco();
-        document.getElementById("titoloClassifica").textContent = "Classifica Chiosco";
-        document.getElementById("scoreboard").style.display = "none";
-      } else {
-        document.getElementById("classificaChiosco").style.display = "none";
-        document.getElementById("scoreboard").style.display = "table";
-        document.getElementById("titoloClassifica").textContent = "Classifica " + sport.charAt(0).toUpperCase() + sport.slice(1);
-        aggiornaClassifica(sport);
-      }
-    }
+function showDashboard() {
+  nascondiTutte();
+  document.getElementById("dashboard").style.display = "block";
+  aggiornaSelectSquadre();
+  popolaPartite();
+  aggiornaSelectGestione();
+}
 
-  function showLogin() {
-    nascondiTutte();
-    document.getElementById("login").style.display = "block";
-  }
-
-  function showDashboard() {
-    nascondiTutte();
-    document.getElementById("dashboard").style.display = "block";
-    aggiornaSelectSquadre();
-    popolaPartite();
-    aggiornaSelectGestione();
-  }
-
-  function showRefereePanel() {
+function showRefereePanel() {
   nascondiTutte();
   document.getElementById("arbitro").style.display = "block";
-
   const tabella = document.querySelector("#arbitro tbody");
   tabella.innerHTML = "";
   partite
@@ -262,13 +260,12 @@ caricaDatiDaFirebase();
 function showBarPanel() {
   nascondiTutte();
   document.getElementById("barman").style.display = "block";
-
   const panel = document.getElementById("panel");
   panel.innerHTML = "<h2>Coppa Chiosco</h2>";
 
   // Classifica Coppa Chiosco
   const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
-  let classificaHtml = 
+  let classificaHtml = `
     <table style="margin-bottom:20px">
       <thead>
         <tr>
@@ -278,16 +275,16 @@ function showBarPanel() {
         </tr>
       </thead>
       <tbody>
-        ${squadreOrdinate.map(s => 
+        ${squadreOrdinate.map(s => `
           <tr>
             <td>${s.nome}</td>
             <td>${s.sport}</td>
             <td>${s.puntiBar || 0}</td>
           </tr>
-        ).join('')}
+        `).join('')}
       </tbody>
     </table>
-  ;
+  `;
   panel.innerHTML += classificaHtml;
 
   // Pannello inserimento punti
@@ -306,7 +303,7 @@ function showBarPanel() {
   const saveBtn = document.createElement("button");
   saveBtn.textContent = "Salva Classifica Coppa Chiosco";
   saveBtn.onclick = function () {
-    localStorage.setItem("squadre", JSON.stringify(squadre));
+    salvaDati();
     alert("Classifica salvata!");
   };
   panel.appendChild(document.createElement("br"));
@@ -315,10 +312,8 @@ function showBarPanel() {
 
 // Funzione aggiornata che lavora con squadre ordinate
 function aggiungiPuntiBarOrdinate(ordIndex) {
-  // squadreOrdinate è creata dentro showBarPanel(), quindi la ricreiamo qui per l'indice corretto
   const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
   const squadraSelezionata = squadreOrdinate[ordIndex];
-
   const input = document.getElementById(`spesa-${ordIndex}`);
   const euroSpesi = parseFloat(input.value);
 
@@ -333,12 +328,11 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
   const squadraOriginale = squadre.find(s => s.nome === squadraSelezionata.nome);
   squadraOriginale.puntiBar = (squadraOriginale.puntiBar || 0) + punti;
 
+  salvaDati();
   showBarPanel();
 }
 
-
-
-  function login() {
+function login() {
   const user = document.getElementById("username").value;
   const pass = document.getElementById("password").value;
   const found = USERS.find(u => u.username === user && u.password === pass);
@@ -356,37 +350,22 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
   }
 }
 
-  function creaPartita() {
+function creaPartita() {
   const s1Nome = document.getElementById("squadra1").value;
   const s2Nome = document.getElementById("squadra2").value;
-
   let s1 = squadre.find(s => s.nome === s1Nome);
   let s2 = squadre.find(s => s.nome === s2Nome);
-
   if (!s1 || !s2) return alert("Seleziona due squadre valide.");
-  if (s1.nome === s2.nome) return alert("Una squadra non può giocare contro sé stessa.");
+  if (s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
+  if (s1.sport !== s2.sport) return alert("Le squadre devono appartenere allo stesso sport.");
 
-  const esiste = partite.some(p =>
-    (p.squadra1 === s1.nome && p.squadra2 === s2.nome) ||
-    (p.squadra1 === s2.nome && p.squadra2 === s1.nome)
-  );
-
-  if (esiste) return alert("Questa partita esiste già.");
-
-  partite.push({
-    squadra1: s1.nome,
-    squadra2: s2.nome,
-    sport: s1.sport,
-    risultato: null
-  });
-
+  partite.push({ id: Date.now(), squadra1: s1.nome, squadra2: s2.nome, sport: s1.sport, risultato: null });
   salvaDati();
   popolaPartite();
-  aggiornaSelectGestione();
-  alert("Partita creata!");
+  aggiornaMatchList();
 }
 
-  function aggiornaClassifica(sport) {
+function aggiornaClassifica(sport) {
   const tbody = document.getElementById("tbodyScoreboard");
   const thead = document.getElementById("theadScoreboard");
   thead.innerHTML = "";
@@ -452,55 +431,18 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
     });
   });
 }
-  function aggiornaClassificaChiosco() {
+
+function aggiornaClassificaChiosco() {
   const tbody = document.getElementById("tbodyChiosco");
   tbody.innerHTML = "";
 
-  const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0))
+  const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
 
   squadreOrdinate.forEach(s => {
     const tr = document.createElement("tr");
     tr.innerHTML = `<td>${s.nome}</td><td>${s.puntiBar || 0}</td>`;
     tbody.appendChild(tr);
   });
-}
-  function creaPartita() { };
-    const s1Nome = document.getElementById("squadra1").value;
-    const s2Nome = document.getElementById("squadra2").value;
-    let s1 = squadre.find(s => s.nome === s1Nome);
-    let s2 = squadre.find(s => s.nome === s2Nome)
-    if (!s1 || !s2) return alert("Seleziona due squadre valide.");
-    if (s1.nome === s2.nome) return alert("Seleziona due squadre diverse.");
-    if (s1.sport !== s2.sport) return alert("Le squadre devono appartenere allo stesso sport.");
-
-    partite.push({ id: Date.now(), squadra1: s1.nome, squadra2: s2.nome, sport: s1.sport, risultato: null });
-    salvaDati();    if (s1.sport !== s2.sport) return alert("Le squadre devono appartenere allo stesso sport.");
-    popolaPartite();
-    aggiornaMatchList();({ id: Date.now(), squadra1: s1.nome, squadra2: s2.nome, sport: s1.sport, risultato: null });
-  function aggiornaMatchList() {
-  // Funzione da implementare o assumere esistente
-}
-
-function popolaPartite() {
-  aggiornaMatchList(); // Aggiorna la lista delle partite
-
-  const matchSelect = document.getElementById("match");
-  matchSelect.innerHTML = ""; // Svuota il select prima di riempirlo
-
-  partite.forEach(p => {
-    if (p.risultato === null) { // Mostra solo le partite senza risultato
-      const option = document.createElement("option");
-      option.value = p.id;
-      option.textContent = `${p.squadra1} vs ${p.squadra2} (${p.sport})`;
-      matchSelect.appendChild(option);
-    }
-  });
-}
-
-function aggiornaSelectGestione() {
-  const gestione = document.getElementById("selectSquadraGestione");
-  const partiteElimina = document.getElementById("selectPartitaElimina");
-  // Aggiungi qui la logica per aggiornare questi select se necessario
 }
 
 function aggiornaMatchList() {
@@ -524,29 +466,19 @@ function aggiornaMatchList() {
   });
 }
 
-function aggiornaSelectRisultati() {
-  const select = document.getElementById("selectPartitaRisultato");
-  select.innerHTML = "";
+function popolaPartite() {
+  aggiornaMatchList();
 
-  partite.forEach((p, i) => {
-    if (!p.risultato) {
+  const matchSelect = document.getElementById("match");
+  matchSelect.innerHTML = "";
+
+  partite.forEach(p => {
+    if (p.risultato === null) {
       const option = document.createElement("option");
-      option.value = i;
+      option.value = p.id;
       option.textContent = `${p.squadra1} vs ${p.squadra2} (${p.sport})`;
-      select.appendChild(option);
+      matchSelect.appendChild(option);
     }
-  });
-}
-
-function aggiornaSelectElimina() {
-  const select = document.getElementById("selectPartitaElimina");
-  select.innerHTML = "";
-
-  partite.forEach((p, i) => {
-    const option = document.createElement("option");
-    option.value = i;
-    option.textContent = `${p.squadra1} vs ${p.squadra2} (${p.sport})`;
-    select.appendChild(option);
   });
 }
 
@@ -554,13 +486,13 @@ function aggiornaSelectGestione() {
   const select = document.getElementById("selectSquadraGestione");
   select.innerHTML = "";
 
-  const squadre = new Set();
+  const squadreSet = new Set();
   partite.forEach(p => {
-    squadre.add(p.squadra1);
-    squadre.add(p.squadra2);
+    squadreSet.add(p.squadra1);
+    squadreSet.add(p.squadra2);
   });
 
-  squadre.forEach(nome => {
+  squadreSet.forEach(nome => {
     const option = document.createElement("option");
     option.value = nome;
     option.textContent = nome;
@@ -568,39 +500,26 @@ function aggiornaSelectGestione() {
   });
 }
 
-function aggiornaRiepilogoSquadra() {
-  const squadra = document.getElementById("selectSquadraGestione").value;
-  const ul = document.getElementById("riepilogoSquadra");
-  ul.innerHTML = "";
+function aggiornaSelectSquadre() {
+  const select1 = document.getElementById("squadra1");
+  const select2 = document.getElementById("squadra2");
+  select1.innerHTML = "";
+  select2.innerHTML = "";
 
-  let vinte = 0;
-  let perse = 0;
-  let pareggiate = 0;
+  squadre.forEach(s => {
+    const option1 = document.createElement("option");
+    option1.value = s.nome;
+    option1.textContent = s.nome;
+    select1.appendChild(option1);
 
-  partite.forEach(p => {
-    if (p.risultato) {
-      const [gol1, gol2] = p.risultato.split("-").map(Number);
-
-      if (p.squadra1 === squadra || p.squadra2 === squadra) {
-        if (gol1 === gol2) {
-          pareggiate++;
-        } else {
-          const haVinto =
-            (p.squadra1 === squadra && gol1 > gol2) ||
-            (p.squadra2 === squadra && gol2 > gol1);
-          haVinto ? vinte++ : perse++;
-        }
-      }
-    }
+    const option2 = document.createElement("option");
+    option2.value = s.nome;
+    option2.textContent = s.nome;
+    select2.appendChild(option2);
   });
-
-  ul.innerHTML = `
-    <li>Vinte: ${vinte}</li>
-    <li>Perse: ${perse}</li>
-    <li>Pareggiate: ${pareggiate}</li>
-  `;
 }
 
+// Puoi aggiungere qui altre funzioni di gestione squadre/partite se necessario
 fetch('https://torneo-noi-default-rtdb.europe-west1.firebasedatabase.app/squadre.json')
   .then(response => response.json())
   .then(data => {
