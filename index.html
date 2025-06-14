@@ -183,12 +183,13 @@ let chiosco = {};
 function caricaDatiDaFirebase() {
   db.ref().on('value', snapshot => {
     const data = snapshot.val() || {};
-    squadre = data.squadre || [];
-    partite = data.partite || [];
+    squadre = Array.isArray(data.squadre) ? data.squadre : [];
+    partite = Array.isArray(data.partite) ? data.partite : [];
     punteggi = data.punteggi || {};
     chiosco = data.chiosco || {};
     aggiornaMatchList();
     aggiornaClassificaChiosco();
+    aggiornaSelectSquadre();
     aggiornaSelectGestione();
     popolaPartite();
   });
@@ -207,6 +208,7 @@ function salvaDati() {
 function nascondiTutte() {
   document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
 }
+// Funzione per aggiungere una squadra
 function aggiungiSquadra() {
   const nome = document.getElementById("nuovaSquadra").value.trim();
   const sport = document.getElementById("sportSquadra").value;
@@ -227,6 +229,57 @@ function aggiungiSquadra() {
   alert("Squadra aggiunta!");
 }
 window.aggiungiSquadra = aggiungiSquadra;
+
+// Funzione per aggiornare i select delle squadre
+function aggiornaSelectSquadre() {
+  const select1 = document.getElementById("squadra1");
+  const select2 = document.getElementById("squadra2");
+  if (!select1 || !select2) return;
+  select1.innerHTML = "";
+  select2.innerHTML = "";
+
+  squadre.forEach(s => {
+    const option1 = document.createElement("option");
+    option1.value = s.nome;
+    option1.textContent = s.nome;
+    select1.appendChild(option1);
+
+    const option2 = document.createElement("option");
+    option2.value = s.nome;
+    option2.textContent = s.nome;
+    select2.appendChild(option2);
+  });
+}
+
+// Funzione per aggiornare il select di gestione squadre
+function aggiornaSelectGestione() {
+  const select = document.getElementById("selectSquadraGestione");
+  if (!select) return;
+  select.innerHTML = "";
+  squadre.forEach(s => {
+    const option = document.createElement("option");
+    option.value = s.nome;
+    option.textContent = s.nome;
+    select.appendChild(option);
+  });
+}
+
+// Quando carichi i dati da Firebase, aggiorna subito i select
+function caricaDatiDaFirebase() {
+  db.ref().on('value', snapshot => {
+    const data = snapshot.val() || {};
+    squadre = Array.isArray(data.squadre) ? data.squadre : [];
+    partite = Array.isArray(data.partite) ? data.partite : [];
+    punteggi = data.punteggi || {};
+    chiosco = data.chiosco || {};
+    aggiornaMatchList();
+    aggiornaClassificaChiosco();
+    aggiornaSelectSquadre();
+    aggiornaSelectGestione();
+    popolaPartite();
+  });
+}
+caricaDatiDaFirebase();
 
 function showHome() {
   nascondiTutte();
@@ -490,24 +543,19 @@ function popolaPartite() {
 }
 function aggiornaSelectGestione() {
   const select = document.getElementById("selectSquadraGestione");
+  if (!select) return;
   select.innerHTML = "";
-
-  const squadreSet = new Set();
-  partite.forEach(p => {
-    squadreSet.add(p.squadra1);
-    squadreSet.add(p.squadra2);
-  });
-
-  squadreSet.forEach(nome => {
+  squadre.forEach(s => {
     const option = document.createElement("option");
-    option.value = nome;
-    option.textContent = nome;
+    option.value = s.nome;
+    option.textContent = s.nome;
     select.appendChild(option);
   });
 }
 function aggiornaSelectSquadre() {
   const select1 = document.getElementById("squadra1");
   const select2 = document.getElementById("squadra2");
+  if (!select1 || !select2) return;
   select1.innerHTML = "";
   select2.innerHTML = "";
 
@@ -537,10 +585,3 @@ window.aggiungiSquadra = aggiungiSquadra;
 </script>
 </body>
 </html>
-
-{
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}
