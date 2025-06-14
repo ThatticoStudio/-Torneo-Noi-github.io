@@ -148,23 +148,61 @@
     </table>
   </section>
 
+<!-- Firebase App (core) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<!-- Firebase Database -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+  // Configurazione Firebase per la tua app
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxpBzbH_2Adea6nfG2RH4zmFv1S5sW-5g",
+    authDomain: "torneo-noi.firebaseapp.com",
+    databaseURL: "https://torneo-noi-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "torneo-noi",
+    storageBucket: "torneo-noi.firebasestorage.app",
+    messagingSenderId: "879100832496",
+    appId: "1:879100832496:web:b4526acfef3e267d347035",
+    measurementId: "G-TLLC0NRJCV"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 <script>
   const USERS = [
   { username: "admin", password: "1234", ruolo: "admin" },
   { username: "arbitri", password: "1234", ruolo: "arbitro" },
   { username: "chiosco", password: "1234", ruolo: "chiosco" }
 ];
-  let squadre = JSON.parse(localStorage.getItem("squadre")) || [];
-  let partite = JSON.parse(localStorage.getItem("partite")) || [];
-  let punteggi = JSON.parse(localStorage.getItem("punteggi")) || {};
-  let chiosco= JSON.parse(localStorage.getItem("chiosco")) || {};
+  let squadre = [];
+let partite = [];
+let punteggi = {};
+let chiosco = {};
+
+function caricaDatiDaFirebase() {
+  db.ref().on('value', snapshot => {
+    const data = snapshot.val() || {};
+    squadre = data.squadre || [];
+    partite = data.partite || [];
+    punteggi = data.punteggi || {};
+    chiosco = data.chiosco || {};
+    aggiornaMatchList();
+    aggiornaClassificaChiosco();
+    // ...altre funzioni di refresh...
+  });
+}
+
+// Chiama questa funzione all’avvio
+caricaDatiDaFirebase();
 
   function salvaDati() {
-    localStorage.setItem("squadre", JSON.stringify(squadre));
-    localStorage.setItem("partite", JSON.stringify(partite));
-    localStorage.setItem("punteggi", JSON.stringify(punteggi));
-    localStorage.setItem("chiosco", JSON.stringify(chiosco));
-  }
+  db.ref().set({
+    squadre: squadre,
+    partite: partite,
+    punteggi: punteggi,
+    chiosco: chiosco
+  });
+}
 
   function nascondiTutte() {
     document.querySelectorAll('section').forEach(sec => sec.style.display = 'none');
