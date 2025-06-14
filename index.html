@@ -267,7 +267,7 @@ function showBarPanel() {
 
   // Classifica Coppa Chiosco
   const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
-  let classificaHtml  
+  let classificaHtml = 
     <table style="margin-bottom:20px">
       <thead>
         <tr>
@@ -277,13 +277,13 @@ function showBarPanel() {
         </tr>
       </thead>
       <tbody>
-        ${squadreOrdinate.map(s => `
+        ${squadreOrdinate.map(s => 
           <tr>
             <td>${s.nome}</td>
             <td>${s.sport}</td>
             <td>${s.puntiBar || 0}</td>
           </tr>
-        `).join('')}
+        ).join('')}
       </tbody>
     </table>
   ;
