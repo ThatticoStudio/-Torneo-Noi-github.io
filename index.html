@@ -455,7 +455,7 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
   const tbody = document.getElementById("tbodyChiosco");
   tbody.innerHTML = "";
 
-  const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
+  const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0))
 
   squadreOrdinate.forEach(s => {
     const tr = document.createElement("tr");
@@ -601,6 +601,9 @@ function aggiornaRiepilogoSquadra() {
 }
 
 
+</script>
+<script>
+  window.onload = showHome;
 </script>
 </body>
 </html>
