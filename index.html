@@ -169,12 +169,12 @@
 </script>
 
 <script>
-  const USERS = [
+const USERS = [
   { username: "admin", password: "1234", ruolo: "admin" },
   { username: "arbitri", password: "1234", ruolo: "arbitro" },
   { username: "chiosco", password: "1234", ruolo: "chiosco" }
 ];
-  
+
 let squadre = [];
 let partite = [];
 let punteggi = {};
@@ -213,7 +213,6 @@ function showHome() {
   document.getElementById("home").style.display = "block";
   aggiornaMatchList();
 }
-
 function showClassifica(sport) {
   nascondiTutte();
   document.getElementById("classifica").style.display = "block";
@@ -229,12 +228,10 @@ function showClassifica(sport) {
     aggiornaClassifica(sport);
   }
 }
-
 function showLogin() {
   nascondiTutte();
   document.getElementById("login").style.display = "block";
 }
-
 function showDashboard() {
   nascondiTutte();
   document.getElementById("dashboard").style.display = "block";
@@ -242,7 +239,6 @@ function showDashboard() {
   popolaPartite();
   aggiornaSelectGestione();
 }
-
 function showRefereePanel() {
   nascondiTutte();
   document.getElementById("arbitro").style.display = "block";
@@ -256,7 +252,6 @@ function showRefereePanel() {
       tabella.appendChild(row);
     });
 }
-
 function showBarPanel() {
   nascondiTutte();
   document.getElementById("barman").style.display = "block";
@@ -309,8 +304,6 @@ function showBarPanel() {
   panel.appendChild(document.createElement("br"));
   panel.appendChild(saveBtn);
 }
-
-// Funzione aggiornata che lavora con squadre ordinate
 function aggiungiPuntiBarOrdinate(ordIndex) {
   const squadreOrdinate = [...squadre].sort((a, b) => (b.puntiBar || 0) - (a.puntiBar || 0));
   const squadraSelezionata = squadreOrdinate[ordIndex];
@@ -331,7 +324,6 @@ function aggiungiPuntiBarOrdinate(ordIndex) {
   salvaDati();
   showBarPanel();
 }
-
 function login() {
   const user = document.getElementById("username").value;
   const pass = document.getElementById("password").value;
@@ -349,7 +341,6 @@ function login() {
     alert("Credenziali non valide!");
   }
 }
-
 function creaPartita() {
   const s1Nome = document.getElementById("squadra1").value;
   const s2Nome = document.getElementById("squadra2").value;
@@ -364,7 +355,6 @@ function creaPartita() {
   popolaPartite();
   aggiornaMatchList();
 }
-
 function aggiornaClassifica(sport) {
   const tbody = document.getElementById("tbodyScoreboard");
   const thead = document.getElementById("theadScoreboard");
@@ -431,7 +421,6 @@ function aggiornaClassifica(sport) {
     });
   });
 }
-
 function aggiornaClassificaChiosco() {
   const tbody = document.getElementById("tbodyChiosco");
   tbody.innerHTML = "";
@@ -444,7 +433,6 @@ function aggiornaClassificaChiosco() {
     tbody.appendChild(tr);
   });
 }
-
 function aggiornaMatchList() {
   const calcioTbody = document.getElementById("matchListCalcio");
   const volleyTbody = document.getElementById("matchListPallavolo");
@@ -465,7 +453,6 @@ function aggiornaMatchList() {
     }
   });
 }
-
 function popolaPartite() {
   aggiornaMatchList();
 
@@ -481,7 +468,6 @@ function popolaPartite() {
     }
   });
 }
-
 function aggiornaSelectGestione() {
   const select = document.getElementById("selectSquadraGestione");
   select.innerHTML = "";
@@ -499,7 +485,6 @@ function aggiornaSelectGestione() {
     select.appendChild(option);
   });
 }
-
 function aggiornaSelectSquadre() {
   const select1 = document.getElementById("squadra1");
   const select2 = document.getElementById("squadra2");
@@ -519,19 +504,15 @@ function aggiornaSelectSquadre() {
   });
 }
 
-// Puoi aggiungere qui altre funzioni di gestione squadre/partite se necessario
-fetch('https://torneo-noi-default-rtdb.europe-west1.firebasedatabase.app/squadre.json')
-  .then(response => response.json())
-  .then(data => {
-    if (data) {
-      Object.entries(data).forEach(([id, squadra]) => {
-        console.log(squadra.nome, squadra.sport, squadra.girone);
-        // Qui puoi aggiungere codice per mostrare i dati nella pagina
-      });
-    } else {
-      console.log('Nessuna squadra trovata');
-    }
-  });
+window.showHome = showHome;
+window.showClassifica = showClassifica;
+window.showLogin = showLogin;
+window.showDashboard = showDashboard;
+window.showRefereePanel = showRefereePanel;
+window.showBarPanel = showBarPanel;
+window.login = login;
+window.creaPartita = creaPartita;
+window.aggiungiPuntiBarOrdinate = aggiungiPuntiBarOrdinate;
 </script>
 </body>
 </html>
