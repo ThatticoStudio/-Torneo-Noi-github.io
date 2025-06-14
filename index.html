@@ -600,20 +600,18 @@ function aggiornaRiepilogoSquadra() {
   `;
 }
 
-fetch('https://torneo-noi-default-rtdb.europe-west1.firebasedatabase.app/squadre.json', {
-  method: 'POST',
-  body: JSON.stringify({
-    nome: 'Squadra A',
-    sport: 'calcio',
-    chiosco: true,
-    girone: 'B',
-    punteggio: 12,
-    gol: 8,
-  }),
-  headers: { 'Content-Type': 'application/json' }
-})
+fetch('https://torneo-noi-default-rtdb.europe-west1.firebasedatabase.app/squadre.json')
   .then(response => response.json())
-  .then(data => console.log('Squadra salvata:', data));
+  .then(data => {
+    if (data) {
+      Object.entries(data).forEach(([id, squadra]) => {
+        console.log(squadra.nome, squadra.sport, squadra.girone);
+        // Qui puoi aggiungere codice per mostrare i dati nella pagina
+      });
+    } else {
+      console.log('Nessuna squadra trovata');
+    }
+  });
 </script>
 <script>
   window.onload = showHome;
