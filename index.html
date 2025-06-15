@@ -426,7 +426,8 @@ function aggiornaClassifica(sport) {
 
     // Calcolo classifica
     const classifica = squadreGirone.map(s => {
-      const dati = punteggi[s.nome] || {};
+      const key = toFirebaseKey(s.nome); // <-- usa la chiave corretta!
+      const dati = punteggi[key] || {};
       if (sport === "calcio") {
         return {
           nome: s.nome,
