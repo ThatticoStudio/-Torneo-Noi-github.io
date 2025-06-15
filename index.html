@@ -137,12 +137,15 @@
 <button onclick="inserisciRisultato()">Inserisci Risultato</button>
 <p id="esitoInserimento" style="color: green; display: none;">Risultato inserito con successo!</p>
 
-<!-- Per MODIFICARE risultato -->
-<select id="matchEdit"></select>
-<input type="number" id="gol1Edit" placeholder="Gol/Set Squadra 1" />
-<input type="number" id="gol2Edit" placeholder="Gol/Set Squadra 2" />
-<button onclick="modificaRisultato()">Modifica Risultato</button>
-<p id="esitoModifica" style="color: orange; display: none;">Risultato modificato!</p>
+<!-- Blocco per MODIFICARE il risultato di una partita -->
+<div id="modificaPartitaPanel">
+  <h3>Modifica Risultato Partita</h3>
+  <select id="matchEdit"></select>
+  <input type="number" id="gol1Edit" placeholder="Gol/Set Squadra 1" />
+  <input type="number" id="gol2Edit" placeholder="Gol/Set Squadra 2" />
+  <button onclick="modificaRisultato()">Modifica Risultato</button>
+  <p id="esitoModifica" style="color: orange; display: none;">Risultato modificato!</p>
+</div>
     </div>
   </section>
 
