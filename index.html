@@ -130,13 +130,14 @@
       <button onclick="creaPartita()">Crea Partita</button>
 
       <h3>Inserisci Risultato</h3>
-      <select id="match"></select>
-      <input type="number" id="gol1" placeholder="Gol/Set Squadra 1" />
-      <input type="number" id="gol2" placeholder="Gol/Set Squadra 2" />
-      <button onclick="inserisciRisultato()">Inserisci Risultato</button>
-      <p id="esitoInserimento" style="color: green; display: none;">Risultato inserito con successo!</p>
+      <!-- Per INSERIRE risultato -->
+<select id="match"></select>
+<input type="number" id="gol1" placeholder="Gol/Set Squadra 1" />
+<input type="number" id="gol2" placeholder="Gol/Set Squadra 2" />
+<button onclick="inserisciRisultato()">Inserisci Risultato</button>
+<p id="esitoInserimento" style="color: green; display: none;">Risultato inserito con successo!</p>
 
-      <h3>Modifica Risultato Partita</h3>
+<!-- Per MODIFICARE risultato -->
 <select id="matchEdit"></select>
 <input type="number" id="gol1Edit" placeholder="Gol/Set Squadra 1" />
 <input type="number" id="gol2Edit" placeholder="Gol/Set Squadra 2" />
@@ -199,6 +200,7 @@ function caricaDatiDaFirebase() {
     aggiornaSelectSquadre();
     aggiornaSelectGestione();
     popolaPartite();
+    popolaPartiteEdit();
     aggiornaClassifica("calcio");
     aggiornaClassifica("pallavolo");
   });
