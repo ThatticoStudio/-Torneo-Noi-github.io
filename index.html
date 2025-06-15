@@ -135,6 +135,13 @@
       <input type="number" id="gol2" placeholder="Gol/Set Squadra 2" />
       <button onclick="inserisciRisultato()">Inserisci Risultato</button>
       <p id="esitoInserimento" style="color: green; display: none;">Risultato inserito con successo!</p>
+
+      <h3>Modifica Risultato Partita</h3>
+<select id="matchEdit"></select>
+<input type="number" id="gol1Edit" placeholder="Gol/Set Squadra 1" />
+<input type="number" id="gol2Edit" placeholder="Gol/Set Squadra 2" />
+<button onclick="modificaRisultato()">Modifica Risultato</button>
+<p id="esitoModifica" style="color: orange; display: none;">Risultato modificato!</p>
     </div>
   </section>
 
@@ -492,6 +499,20 @@ function popolaPartite() {
       const option = document.createElement("option");
       option.value = p.id;
       option.textContent = `${p.squadra1} vs ${p.squadra2} (${p.sport})`;
+      matchSelect.appendChild(option);
+    }
+  });
+}
+function popolaPartiteEdit() {
+  const matchSelect = document.getElementById("matchEdit");
+  if (!matchSelect) return;
+  matchSelect.innerHTML = "";
+
+  partite.forEach(p => {
+    if (p.risultato) {
+      const option = document.createElement("option");
+      option.value = p.id;
+      option.textContent = `${p.squadra1} vs ${p.squadra2} (${p.sport}) - ${p.risultato}`;
       matchSelect.appendChild(option);
     }
   });
