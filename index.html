@@ -573,6 +573,21 @@ function modificaRisultato() {
   const key1 = toFirebaseKey(partita.squadra1);
   const key2 = toFirebaseKey(partita.squadra2);
 
+  // Inizializza sempre i punteggi e le proprietà
+  function initPunteggio(key, nome, sport) {
+    if (!punteggi[key]) punteggi[key] = { nome: nome };
+    if (sport === "calcio") {
+      if (typeof punteggi[key].gf !== "number") punteggi[key].gf = 0;
+      if (typeof punteggi[key].gs !== "number") punteggi[key].gs = 0;
+    } else {
+      if (typeof punteggi[key].sv !== "number") punteggi[key].sv = 0;
+      if (typeof punteggi[key].sp !== "number") punteggi[key].sp = 0;
+    }
+    if (typeof punteggi[key].punti !== "number") punteggi[key].punti = 0;
+  }
+  initPunteggio(key1, partita.squadra1, partita.sport);
+  initPunteggio(key2, partita.squadra2, partita.sport);
+
   // Rimuovi i vecchi punteggi se esistevano
   if (partita.risultato) {
     const [oldGol1, oldGol2] = partita.risultato.split("-").map(Number);
@@ -607,8 +622,6 @@ function modificaRisultato() {
 
   // Applica il nuovo risultato
   partita.risultato = `${gol1}-${gol2}`;
-  if (!punteggi[key1]) punteggi[key1] = { nome: partita.squadra1 };
-  if (!punteggi[key2]) punteggi[key2] = { nome: partita.squadra2 };
 
   if (partita.sport === "calcio") {
     punteggi[key1].gf += gol1;
