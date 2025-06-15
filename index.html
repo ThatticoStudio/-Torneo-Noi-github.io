@@ -12,7 +12,7 @@
     nav a { margin: 0 15px; text-decoration: none; color: #004aad; font-weight: bold; cursor: pointer; }
     section { padding: 20px; display: none; }
     .active { display: block; }
-    .login-form, .dashboard { max-width: 500px; margin: auto; }
+    .login-form, .dashboard { max-width: 500px, margin: auto; }
     input, button, select { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
@@ -426,7 +426,7 @@ function aggiornaClassifica(sport) {
 
     // Calcolo classifica
     const classifica = squadreGirone.map(s => {
-      const key = toFirebaseKey(s.nome);
+      const key = toFirebaseKey(s.nome); // <-- usa la chiave corretta!
       const dati = punteggi[key] || {};
       if (sport === "calcio") {
         return {
@@ -687,8 +687,8 @@ function inserisciRisultato() {
   const key2 = toFirebaseKey(partita.squadra2);
 
   // Salva anche il nome originale per la visualizzazione
-  if (!punteggi[key1]) punteggi[key1] = { nome: partita.squadra1 };
-  if (!punteggi[key2]) punteggi[key2] = { nome: partita.squadra2 };
+  punteggi[key1] = punteggi[key1] || { nome: partita.squadra1 };
+  punteggi[key2] = punteggi[key2] || { nome: partita.squadra2 };
 
   if (partita.sport === "calcio") {
     // Gol fatti/subiti
