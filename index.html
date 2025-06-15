@@ -426,7 +426,7 @@ function aggiornaClassifica(sport) {
 
     // Calcolo classifica
     const classifica = squadreGirone.map(s => {
-      const key = toFirebaseKey(s.nome); // <-- usa la chiave corretta!
+      const key = toFirebaseKey(s.nome);
       const dati = punteggi[key] || {};
       if (sport === "calcio") {
         return {
@@ -715,8 +715,9 @@ function inserisciRisultato() {
 
   salvaDati();
   aggiornaMatchList();
-  aggiornaClassifica(partita.sport);
+  aggiornaClassifica(partita.sport); // <-- aggiorna la classifica giusta
   popolaPartite();
+  popolaPartiteEdit();
   document.getElementById("gol1").value = "";
   document.getElementById("gol2").value = "";
   document.getElementById("esitoInserimento").style.display = "block";
